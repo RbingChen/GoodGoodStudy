@@ -17,7 +17,7 @@ class Q_Trainer(object):
             'train_batch_size': params['batch_size'],
             'double_q': params['double_q'],
         }
-
+        # 重点参数获取
         env_args = get_env_kwargs(params['env_name'])
 
         self.agent_params = {**train_args, **env_args, **params}

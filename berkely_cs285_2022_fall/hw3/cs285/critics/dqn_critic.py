@@ -1,3 +1,5 @@
+import numpy as np
+
 from .base_critic import BaseCritic
 import torch
 import torch.optim as optim
@@ -63,26 +65,35 @@ class DQNCritic(BaseCritic):
         terminal_n = ptu.from_numpy(terminal_n)
 
         qa_t_values = self.q_net(ob_no)
+        # https://blog.csdn.net/u012897374/article/details/120692565
         q_t_values = torch.gather(qa_t_values, 1, ac_na.unsqueeze(1)).squeeze(1)
         
         # TODO compute the Q-values from the target network 
-        qa_tp1_values = TODO
-
+        qa_tp1_values = self.q_net_target(ob_no)
+        """
+           Q网络的输入是 observetions、输出 对应action的 values，也就是每一维度都是一个Q(s,a)值。
+        """
         if self.double_q:
             # You must fill this part for Q2 of the Q-learning portion of the homework.
             # In double Q-learning, the best action is selected using the Q-network that
             # is being updated, but the Q-value for this action is obtained from the
             # target Q-network. Please review Lecture 8 for more details,
             # and page 4 of https://arxiv.org/pdf/1509.06461.pdf is also a good reference.
-            TODO
+            #TODO
+            next_q = self.q_net(next_ob_no)
+            action_best = np.argmax(next_q,axis=0)
+            q_tp1 = torch.gather(qa_tp1_values,1,action_best).squeeze
         else:
             q_tp1, _ = qa_tp1_values.max(dim=1)
 
         # TODO compute targets for minimizing Bellman error
         # HINT: as you saw in lecture, this would be:
             #currentReward + self.gamma * qValuesOfNextTimestep * (not terminal)
-        target = TODO
-        target = target.detach()
+        """
+           注意next ob 问题
+        """
+        target = reward_n + self.gamma * q_tp1*(1-terminal_n)
+        target = target.detach()  #无梯度
 
         assert q_t_values.shape == target.shape
         loss = self.loss(q_t_values, target)
