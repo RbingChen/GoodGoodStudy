@@ -1,5 +1,5 @@
 from cs285.infrastructure.utils import *
-
+import numpy as np
 
 class ReplayBuffer(object):
 
@@ -85,4 +85,7 @@ class ReplayBuffer(object):
                 num_datapoints_so_far += get_pathlength(recent_rollout)
             rollouts_to_return = self.paths[-num_recent_rollouts_to_return:]
             observations, actions, next_observations, terminals, concatenated_rews, unconcatenated_rews = convert_listofrollouts(rollouts_to_return)
+            ## 返回的 rewards 是 没有concat的。 [ arr1,arr2,arr3 ... ]，每个arr1 对应一个轨迹
+            ## observations维度 [(batch_size * 轨迹长度) ,ob_dim]
+
             return observations, actions, unconcatenated_rews, next_observations, terminals

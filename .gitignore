@@ -2,3 +2,4 @@
 .idea/*
 .idea
 events*
+.ipynb_checkpoints/*
